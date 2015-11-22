@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+<title>Canvas Animation</title>
+<canvas id="canvas" width="800" height="800" style="background-color: #0e74a2;"></canvas>
+<script>
+var can, ctx, step = 20, steps = 150; delay = 20;
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+var time = false;
+var circles = [];
+var loop = function(){
+var now = new Date().getTime();
+var d = now - (time || now); 
+time = now;  
+
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  
+
+  for(var i = 0; i < circles.length; i++){
+    circles[i].update(d);
+    circles[i].draw();
+  } 
+
+  requestAnimationFrame(loop);
+  
+};
+
+function init() {
+ can = document.getElementById("canvas");
+ ctx = can.getContext("2d");
+ ctx.fillStyle = "white";
+ ctx.font = "300pt Helvetica";
+ ctx.textAlign = "center";
+ ctx.textBaseline = "middle";
+ TextSmallToBig();
+        }
+function TextSmallToBig() {
+  step++;
+  ctx.clearRect(0, 0, can.width, can.height);
+  ctx.save();
+  ctx.translate(can.width / 2, can.height / 2);
+  ctx.font = step + "pt Helvetica";
+  ctx.fillText("Hello!", 0, 0);
+  ctx.restore();
+    if (step < steps)
+      var t = setTimeout('TextSmallToBig()', 20);
+        }
+
+var circle = function(options){
+  
+
+  var circle = this;
+  circle.settings = {
+    x: 0,
+    y: 0,
+    radius: 1,
+    orientation: 0,
+    vector: { x: 0, y: 0 },
+    speed: 5,
+    color: { red: 0, green: 0, blue: 0, alpha: 1 }
+  };
+  
+
+  var newsettings = {};
+  for(var attrname in circle.settings){ newsettings[attrname] = circle.settings[attrname]; }
+  for(var attrname in options){ newsettings[attrname] = options[attrname]; }
+  circle.settings = newsettings;
+  
+
+  circle.update = function(d){
+    
+
+    circle.settings.x += circle.settings.vector.x * circle.settings.speed * d;
+    circle.settings.y += circle.settings.vector.y * circle.settings.speed * d;
+    
+    if(circle.settings.x < 0 && circle.settings.vector.x < 0 || circle.settings.x > canvas.width && circle.settings.vector.x > 0){
+      circle.settings.vector.x = circle.settings.vector.x * -1;
+    }
+    if(circle.settings.y < 0 && circle.settings.vector.y < 0 || circle.settings.y > canvas.height && circle.settings.vector.y > 0){
+      circle.settings.vector.y = circle.settings.vector.y * -1;
+    }
+    
+  }; 
+
+  circle.draw = function(){   
+
+    var gradient = context.createRadialGradient(circle.settings.x, circle.settings.y, circle.settings.radius / 5, circle.settings.x, circle.settings.y, circle.settings.radius);
+    gradient.addColorStop(0, 'rgba(' + circle.settings.color.red + ', ' + circle.settings.color.green + ', ' + circle.settings.color.blue + ', ' + circle.settings.color.alpha + ')');
+    context.fillStyle = gradient;
+    
+
+    context.beginPath();
+    context.arc(circle.settings.x, circle.settings.y, circle.settings.radius, 0, 2 * Math.PI, false);
+    context.fill();
+    
+  };
+  
+};
+
+var newcircles = function(){
+  
+
+  circles = [];
+  
+
+  for(var i = 0; i < 10; i++){
+    
+
+    var newcircle = new circle({
+      x: Math.floor(Math.random() * canvas.width),
+      y: Math.floor(Math.random() * canvas.height),
+      radius: Math.floor(Math.random() * canvas.width),
+      orientation: Math.floor(Math.random() * 360),
+      vector: {
+        x: Math.random() / 40,
+        y: Math.random() / 40
+      },
+      speed: Math.random(),
+      color: {
+        red: 100 + Math.floor(Math.random() * 155),
+        green: 100 + Math.floor(Math.random() * 155),
+        blue: 100 + Math.floor(Math.random() * 155),
+        alpha: 0.1 + Math.random()
+      }
+    });
+    
+
+    circles.push(newcircle);
+    
+  }
+  
+};
+
+window.addEventListener('click', newcircles, false);
+window.addEventListener('touchend', newcircles, false);
+newcircles();
+loop();
+</script>
+</head>
+<body onload="init();">
+<canvas id='canvas' width=800 height=800></canvas>
+</body>   
+</html> 
